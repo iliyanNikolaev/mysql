@@ -1,11 +1,15 @@
 const express = require("express");
 const mysql = require("mysql");
+const ejsLayout = require("express-ejs-layouts");
 
 const server = express();
 const port = process.env.PORT || 3001;
 
 server.use(express.urlencoded({ extended: false }));
 server.use(express.json());
+server.use(express.static("public"));
+server.use(ejsLayout);
+server.set("view engine", "ejs");
 
 const pool = mysql.createPool({
   connectionLimit: 10,
@@ -24,7 +28,9 @@ server.get("/phones", (req, res) => {
     conn.query("SELECT * from phones", (err, rows) => {
       conn.release();
 
-      !err ? res.send(rows) : res.status(404).send("error in db");
+      !err
+        ? res.status(200).render("index", { phones: rows })
+        : res.status(404).render("404");
     });
   });
 });
