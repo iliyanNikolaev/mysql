@@ -27,9 +27,23 @@ server.get("/phones", (req, res) => {
 
     conn.query("SELECT * from phones", (err, rows) => {
       conn.release();
-
+      console.log(rows);
       !err
         ? res.status(200).render("index", { phones: rows })
+        : res.status(404).render("404");
+    });
+  });
+});
+
+server.get("/phones/:id", (req, res) => {
+  pool.getConnection((err, conn) => {
+    if (err) throw err;
+
+    conn.query("SELECT * from phones where id = ?", [req.params.id], (err, rows) => {
+      conn.release();
+      console.log(rows);
+      !err
+        ? res.status(200).render("product", { phone: rows[0] })
         : res.status(404).render("404");
     });
   });
